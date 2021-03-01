@@ -26,19 +26,19 @@ Scenario: Start a new round
 
 
 Scenario Outline: Guessing a word
-  Given | I'm on the game page and i get a <word> to guess
-  When | I make an <attempt> to guess the word's letters
-  Then | I should get <feedback> wether my attempt right is or not
+  Given | I'm on the game page and i get a "<word>" to guess
+  When | I make an "<attempt>" to guess the word's letters
+  Then | I should get "<feedback>" wether my attempt right is or not
 
     Examples:
     If the letter is on the right place then use(+)
     If the letter exists but it is not on the right place the use(?)
     If the letter does not exist then use(-)
 
-      | word  | attempt | feedback
+      | word  | attempt | feedback |
 
-      | Baard | Barst   | ++?--
-      | Baard | Draad   | -?+?+
-      | Baard | Bonje   | +----
+      | Baard | Barst   | ++?--    |
+      | Baard | Draad   | -?+?+    |
+      | Baard | Bonje   | +----    |
 
 
