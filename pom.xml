@@ -129,12 +129,12 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.10</minimum>
+                                            <minimum>0.60</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.10</minimum>
+                                            <minimum>0.60</minimum>
                                         </limit>
                                         <limit>
                                             <counter>CLASS</counter>
@@ -150,7 +150,7 @@
             </plugin>
             <plugin>
                 <configuration>
-                    <mutationThreshold>30</mutationThreshold>
+                    <mutationThreshold>50</mutationThreshold>
                 </configuration>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
