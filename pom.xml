@@ -17,6 +17,10 @@
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.projectKey>Bashar11_cisq1-lingo</sonar.projectKey>
+        <sonar.organization>bashar11</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.exclusions>**/LingoApplication.java</sonar.exclusions>
     </properties>
 
     <dependencies>
@@ -84,6 +88,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+
                     <source>11</source>
                     <target>11</target>
                 </configuration>
@@ -134,7 +139,7 @@
                                         <limit>
                                             <counter>CLASS</counter>
                                             <value>MISSEDCOUNT</value>
-                                            <maximum>0.60</maximum>
+                                            <maximum>4</maximum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -144,6 +149,9 @@
                 </executions>
             </plugin>
             <plugin>
+                <configuration>
+                    <mutationThreshold>90</mutationThreshold>
+                </configuration>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
                 <version>1.6.2</version>
@@ -155,6 +163,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
         </plugins>
     </build>
 </project>
