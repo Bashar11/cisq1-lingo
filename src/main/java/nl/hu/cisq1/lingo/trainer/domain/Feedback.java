@@ -17,19 +17,16 @@ public class Feedback {
     public Feedback( String attempt, List<Mark>marks){
         if (attempt.length() != marks.size()) {
             throw new InvalidFeedbackException(attempt.length(), marks.size());
-        }else{
+        }
             this.attempt = attempt;
             this.marks= marks;
 
-        }
 
     }
 
-    public Feedback(List<Mark>marks){
+    public Feedback(){}
 
-            this.marks= marks;
 
-    }
 
     public boolean wordCorrect(){
         for (Mark mark : marks){
@@ -78,14 +75,16 @@ public class Feedback {
 
 
 
-    public List<String > giveHint(String wordToGuess,List<String> previousHint){
+    public String giveHint(String wordToGuess,String previousHint){
 
         String [] splittedWord = wordToGuess.split("");
+        String [] splittedPreviousHint = previousHint.split("");
+
 
         for(int i = 0; i < splittedWord.length; i++)
 
             if (!(marks.get(i) == Mark.Correct))
-                hints.add(previousHint.get(i));
+                hints.add(splittedPreviousHint[i]);
 
              else if (marks.get(i) == Mark.Correct)
                 hints.add(splittedWord[i]);
@@ -94,8 +93,36 @@ public class Feedback {
                 hints.add(".");
 
 
-        return hints;
+        return String.join("",hints);
     }
+
+    public static List<Mark> rightWord(String wordToGuess, String word) {
+        List<Mark> rightWord = new ArrayList<>();
+
+        if ((word.length() == wordToGuess.length())) {
+            for (int i = 0; i < wordToGuess.length(); i++) {
+                if (wordToGuess.charAt(i) == word.charAt(i)) {
+                    rightWord.add(Mark.Correct);
+                } else if ((wordToGuess.charAt(i) != word.charAt(i))
+                        && wordToGuess.indexOf(word.charAt(i)) != -1)
+                    rightWord.add(Mark.Present);
+                else if (wordToGuess.charAt(i) != word.charAt(i) && wordToGuess.indexOf(word.charAt(i)) == -1) {
+                    rightWord.add(Mark.Absent);
+
+                } else {
+                    rightWord.add(Mark.Invalid);
+
+                }
+
+            }}
+
+        return rightWord;
+
+    }
+
+
+
+
 
 
 
