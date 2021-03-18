@@ -33,14 +33,14 @@ public class TrainerServiceIntegrationTest {
 
     private WordService wordService;
 
-    @Test
-    @DisplayName("new Round is saved")
-    void newRoundIsSavedTest() {
-        LingoGame game = gameService.startGame();
-        gameService.newRound(game.getId());
-        game = gameService.getGame(game.getId());
-        assertEquals(1, game.getRounds().size());
-    }
+//    @Test
+//    @DisplayName("new Round is saved")
+//    void newRoundIsSavedTest() {
+//        LingoGame game = gameService.startGame();
+//        gameService.newRound(game.getId());
+//        game = gameService.getGame(game.getId());
+//        assertEquals(1, game.getRounds().size());
+//    }
 
     @BeforeEach
     void before() {
