@@ -1,7 +1,5 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
-import nl.hu.cisq1.lingo.words.domain.Word;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,81 +17,82 @@ class RoundTest {
 
     @Test
     @DisplayName("makes a round finished")
+    void roundId() {
+        Round round = new Round("woord");
+
+        assertEquals(round.getLength(), 5);
+    }
+
+    @Test
+    @DisplayName("makes a round finished")
     void roundOver() {
-        Word word = new Word("woord");
-        Round round = new Round(word);
+        Round round = new Round("woord");
 
-        round.getFeedbacks("waard", List.of(Correct, Correct, Correct, Correct, Correct));
+        round.getFeedbacks("waard", List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT));
 
-        assertTrue(round.roundFinished());
-    }
-
-
-
-
-
-
-//    @Test
-//    @DisplayName("increase round number when the word is correctly guessed")
-//    void increaseRound() {
-//        Word word = new Word("boord");
-//        Feedback feedback = new Feedback("boord", List.of(Correct, Correct, Correct, Correct, Correct));
-//        Round round = new Round(word.toString(), feedback);
-//        assertTrue(round.increaseRound());
-//    }
-
-    @Test
-    @DisplayName("Dont increase round number when the word is not correctly guessed")
-    void dontIncreaseRound() {
-        Word word = new Word("woord");
-        Feedback feedback = new Feedback("boord", List.of(Absent, Absent, Absent, Absent, Absent));
-        Round round = new Round(word.toString(), feedback);
-        assertFalse(round.increaseRound());
+        assertTrue(round.isRoundFinished());
     }
 
     @Test
-    @DisplayName("increase turn number when the word is not guessed")
-    void increaseAttempt() {
-        Word word = new Word("klaar");
-        Feedback feedback = new Feedback("ksaar", List.of(Correct,Absent,Correct,Correct,Correct));
-        Round round = new Round(word.toString(), feedback);
-        assertTrue(round.increaseAttempt(1));
+    @DisplayName("round is finished based on a right attempt")
+    void roundIsFinishedByGuess(){
+        Round round = new Round("klaar");
+        round.guess("klaar");
+        assertTrue(round.isRoundFinished());
     }
 
     @Test
-    @DisplayName("do not increase turn number when the word is correctly guessed")
-    void dontIncreaseAttempt() {
-        Word word = new Word("boord");
-        Round round = new Round(word);
-        round.getFeedbacks("boord", List.of(Correct, Correct, Correct, Correct, Correct));
-
-        assertFalse(round.increaseAttempt(1));
+    @DisplayName("round is not finished based when there are 4 attempt made")
+    void roundNotFinishedByWrongGuess(){
+        Round round = new Round("klaar");
+        round.guess("klaas");
+        round.guess("klaes");
+        round.guess("klaws");
+        round.guess("klass");
+        assertFalse(round.isRoundFinished());
     }
 
+    @Test
+    @DisplayName("round is not finished based when there are 5 wrong attempts made")
+    void roundIsFinishedBy5WrongGuess(){
+        Round round = new Round("klaar");
+        round.guess("klaas");
+        round.guess("klaes");
+        round.guess("klaws");
+        round.guess("klass");
+        round.guess("klars");
+        assertTrue(round.isRoundFinished());
+    }
+
+    @Test
+    @DisplayName("round is not finished based on wrong attempt that has been made, returning the right marks as well")
+    void roundIsNotFinished() {
+        Round round = new Round("woord");
+        round.getFeedbacks("boord", List.of(ABSENT, CORRECT, CORRECT, CORRECT, CORRECT));
+
+        assertFalse(round.isRoundFinished());
+    }
 
     @Test
     @DisplayName("round is not finished based on guess attempt that has been made")
-    void roundIsNotFinished() {
-        Word word = new Word("woord");
-        Feedback feedback = new Feedback("boord", List.of(Absent, Correct, Correct, Correct, Correct));
+    void roundIsFinished() {
+        Round round = new Round("woord");
+        round.getFeedbacks("woord", List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT));
 
-        Round round = new Round(word.toString(), feedback);
-
-        assertFalse(round.roundFinished());
+        assertTrue(round.isRoundFinished());
     }
 
     @Test
-    @DisplayName("round is finished based on too many guesses")
+    @DisplayName("round is finished based on feedback history when too many guesses are made, returning the list of feedbacks as well")
     void roundIsNotFinishedTooManyAttempts() {
 
         Round round = new Round("woord");
-        round.getFeedbacks("boord", List.of(Absent, Correct, Correct, Correct, Correct));
-        round.getFeedbacks("boord", List.of(Absent, Correct, Correct, Correct, Correct));
-        round.getFeedbacks("boord", List.of(Absent, Correct, Correct, Correct, Correct));
-        round.getFeedbacks("boord", List.of(Absent, Correct, Correct, Correct, Correct));
-        round.getFeedbacks("boord", List.of(Absent, Correct, Correct, Correct, Correct));
-        round.getFeedbacks("boord", List.of(Absent, Correct, Correct, Correct, Correct));
-        assertTrue(round.roundFinished());
+        round.getFeedbacks("boord", List.of(ABSENT, CORRECT, CORRECT, CORRECT, CORRECT));
+        round.getFeedbacks("boord", List.of(ABSENT, CORRECT, CORRECT, CORRECT, CORRECT));
+        round.getFeedbacks("boord", List.of(ABSENT, CORRECT, CORRECT, CORRECT, CORRECT));
+        round.getFeedbacks("boord", List.of(ABSENT, CORRECT, CORRECT, CORRECT, CORRECT));
+        round.getFeedbacks("boord", List.of(ABSENT, CORRECT, CORRECT, CORRECT, CORRECT));
+        assertTrue(round.isRoundFinished());
     }
 
 
@@ -122,11 +121,54 @@ class RoundTest {
     }
 
     @Test
-    void getFeedback() {
-        Round round = new Round("banana");
-        round.guess("sanana");
-        assertEquals(List.of(new Feedback("sanana", List.of(Absent, Correct, Correct, Correct, Correct, Correct))), round.getFeedbacks());
+    @DisplayName("adding feedback to feedbacks list and checking if it exists")
+    void RoundTEst(){
+        Round round = new Round("woord");
+        Feedback feedback = new Feedback("waard",List.of(CORRECT,ABSENT,ABSENT,CORRECT,CORRECT));
+        round.getFeedbacks().add(feedback);
+        assertEquals(feedback, round.getLastFeedback());
     }
+
+
+    @Test
+    @DisplayName("Testing the string of a word that should be guessed")
+    void stringCheck() {
+        Round round = new Round("slaan");
+        assertEquals(round.getWordToGuess(),"slaan");
+    }
+
+    @Test
+    @DisplayName("Testing the number of a attempts that have been made")
+    void attemptsCheck() {
+        Round round = new Round("slaan");
+        round.guess("staar");
+        round.guess("slark");
+        assertEquals(round.getAttempts(),2);
+    }
+
+    @Test
+    @DisplayName("Testing the number of a attempts that have been made")
+    void idCheck() {
+        Round round = new Round("slaan");
+        round.guess("staar");
+        round.guess("slark");
+        round.setId(1L);
+        assertEquals(round.getId(),1);
+    }
+
+
+    @Test
+    @DisplayName("setting the relationship between round and game")
+    void gameOfRoundCHeck() {
+        LingoGame game = new LingoGame();
+        Round round = new Round("slaan");
+        round.setLingo(game);
+        assertEquals(round.getLingo(),game);
+    }
+
+
+
+
 
 
 

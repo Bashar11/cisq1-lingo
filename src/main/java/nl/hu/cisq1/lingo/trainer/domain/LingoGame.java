@@ -1,82 +1,105 @@
 package nl.hu.cisq1.lingo.trainer.domain;
-
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import nl.hu.cisq1.lingo.trainer.domain.exception.RoundIsNotFinishedException;
-import nl.hu.cisq1.lingo.words.domain.Word;
+import nl.hu.cisq1.lingo.trainer.domain.exception.RoundFinishedException;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@Table(name = "lingo")
+@Entity
 public class LingoGame {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private int score ;
-    private List<Round> rounds = new ArrayList<>();
-    private Player player;
-    private boolean gameOver;
+    @Column
+    private double score;
+    @OneToMany(mappedBy = "lingo")
+    private final List<Round> rounds = new ArrayList<>();
+    @Column
     private State gameState;
-    private String  wordToguess;
-    private int wordLength;
+    @Column
+    private String wordToGuess;
+    @Column
+    private int length;
 
 
-    public LingoGame() {}
-
-    public LingoGame(Long id, Player player, boolean gameOver, String wordToguess) {
-        rounds = new ArrayList<>();
+    public boolean isRoundFinished() {
+        Round lastRound = this.getLastRound();
+        return lastRound.isRoundFinished();
     }
 
-    public void startNewGame(String wordTouess) {
-        Round round = new Round(wordTouess);
-//        round.giveHintAtBegin();
-        rounds.add(round);
-    }
 
-    private void addWordLength() {
-        if(this.wordLength == 7) {
-            this.wordLength = 5;
-        }else {
-            this.wordLength++;
+    public int provideNextWordLength() {
+        int wordLength = getLastRound().getWordToGuess().length();
+        if (wordLength == 5) {
+            return this.length = 6;
         }
-    }
 
-    public void startNewRound(String wordTouess) {
-        if (!rounds.stream().allMatch(Round::roundFinished)) {
-            throw new RoundIsNotFinishedException();
+        if (wordLength == 7) {
+            return this.length = 5;
         }
-        addWordLength();
-        Round round = new Round(wordTouess);
-        round.giveHintAtBegin();
-        rounds.add(round);
+
+        return wordLength + 1;
     }
 
+    public void startNewRound(String wordToGuess) {
+        if (gameState != State.ELIMINATED ) {
 
-    public int getWordLength() {
-        int wordLength = 0;
-        for (Round round : rounds) {
-            wordLength = round.getWordLength();
+                Round round = new Round(wordToGuess);
+                rounds.add(round);
+                gameState = State.PLAYING;
+                provideNextWordLength();
         }
-        return wordLength;
+        else{
+            throw new RoundFinishedException();
+        }
+
     }
-    public void calculateScore(int attempt){
-        this.score += 5 * ( 5 - attempt ) + 5;
+
+    public void guess(String attempt) {
+        try {
+            Round round = this.getLastRound();
+            round.guess(attempt);
+            if(round.getLastFeedback().isWordGuessed()){
+                calculateScore(getLastRound().getFeedbacks().size());
+                gameState = State.WAITING_FOR_ROUND;
+            }
+        }catch (RoundFinishedException e){
+            this.gameState = State.ELIMINATED;
+        };
+
     }
 
 
-    public void won(){
-        this.gameState = State.Won;
+//    public Progress getProgress(double score,String lastHint) {
+//        Round round = this.getLastRound();
+//
+//        return new Progress(
+//                score,
+//                round.getFeedbacks(),
+//                round.getLastHint()
+//        );
+//    }
+
+    public double calculateScore(int attempt) {
+        this.score += 5 * (5 - attempt) + 5;
+        return 0; }
+
+    public Round getLastRound() {
+        Round round = new Round();
+        if(rounds.size() == 1){
+            round = rounds.get(0);
+        }else if(!rounds.isEmpty()){
+            round = rounds.get(rounds.size() - 1);
+
+        }
+        return round;
     }
 
-    public void lost(){
-        this.gameState = State.Lose;
-    }
-
-    public boolean gameHasEnded(){
-        return this.gameState.equals(State.Won)|| this.gameState.equals(State.Lose);
-    }
-    public Round getLastRound(){
-        return rounds.get(rounds.size() -1);
-    }
 }
