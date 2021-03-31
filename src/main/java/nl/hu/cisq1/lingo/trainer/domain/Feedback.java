@@ -1,46 +1,45 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import nl.hu.cisq1.lingo.trainer.domain.enums.Mark;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-@Getter
-@Setter
+
+import static nl.hu.cisq1.lingo.trainer.domain.enums.Mark.*;
+
+@Data
 @NoArgsConstructor
 @Entity
 @Table(name = "feedback")
 public class Feedback {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     @Column
     private String attempt;
-    @ManyToOne
-    private Round round;
 
     @Enumerated
     @ElementCollection(targetClass = Mark.class)
     private List<Mark> marks;
-    @Id
-    private Long id;
+
     @Transient
     private boolean wordGuessed;
 
-    public Feedback(String attempt, List<Mark>marks){
+    public Feedback(String attempt, List<Mark> marks) {
         if (attempt.length() != marks.size()) {
             throw new InvalidFeedbackException(attempt.length(), marks.size());
         }
-            this.attempt = attempt;
-            this.marks = marks;
-
-
+        this.attempt = attempt;
+        this.marks = marks;
     }
 
 
     public boolean isWordGuessed() {
-        return marks.stream().allMatch(Mark.CORRECT::equals);
+        return marks.stream().allMatch(CORRECT::equals);
     }
 
 
@@ -52,64 +51,56 @@ public class Feedback {
         return !guessValid();
     }
 
-    @Override
-    public String toString() {
-        return "Feedback{" +
-                "attempt='" + attempt + '\'' +
-                ", round=" + round +
-                ", id=" + id +
-                '}';
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Feedback feedback = (Feedback) o;
-        return Objects.equals(attempt, feedback.attempt) && Objects.equals(round, feedback.round) && Objects.equals(id, feedback.id);
-    }
+    public String giveHint(String attempt, String previousHint) {
+        String[] splitWord = attempt.split("");
+        String[] splitPreviousHint = previousHint.split("");
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(attempt, round, id);
-    }
-
-    public String giveHint(String wordToGuess, String previousHint){
-        String [] splitWord = wordToGuess.split("");
-        String [] splitPreviousHint = previousHint.split("");
         List<String> hints = new ArrayList<>();
         for (int i = 0; i < splitWord.length; i++) {
-            if (marks.get(i) != Mark.CORRECT) {
+            if (marks.get(i) != CORRECT) {
                 hints.add(splitPreviousHint[i]);
             } else {
                 hints.add(splitWord[i]);
             }
         }
 
-        return String.join("",hints);
+        return String.join("", hints);
     }
 
     public static Feedback basedOn(String wordToGuess, String attempt) {
-        List<Mark> marks = new ArrayList<>();
+        if (attempt.length() != wordToGuess.length()) {
+            throw new InvalidFeedbackException(attempt.length(), wordToGuess.length());
+        }
 
-        if ((attempt.length() == wordToGuess.length())) {
-            for (int i = 0; i < wordToGuess.length(); i++) {
-                if (wordToGuess.charAt(i) == attempt.charAt(i)) {
-                    marks.add(Mark.CORRECT);
-                } else if ((wordToGuess.charAt(i) != attempt.charAt(i))
-                        && wordToGuess.indexOf(attempt.charAt(i)) != -1)
-                    marks.add(Mark.PRESENT);
-                else if (wordToGuess.charAt(i) != attempt.charAt(i) && wordToGuess.indexOf(attempt.charAt(i)) == -1) {
-                    marks.add(Mark.ABSENT);
-                } else {
-                    marks.add(Mark.INVALID);
-                }
+        List<Mark> marks = new ArrayList<>();
+        List<Character> remainingLetters = new ArrayList<>();
+        for (int i = 0; i < wordToGuess.length(); i++) {
+            Character attemptLetter = attempt.charAt(i);
+            Character toGuessLetter = wordToGuess.charAt(i);
+
+            if (attemptLetter.equals(toGuessLetter)) {
+                marks.add(CORRECT);
+            } else {
+                marks.add(null);
+                remainingLetters.add(toGuessLetter);
+            }
+        }
+
+        for (int i = 0; i < wordToGuess.length(); i++) {
+            if (CORRECT.equals(marks.get(i))) {
+                continue;
+            }
+
+            Character attemptLetter = attempt.charAt(i);
+            if (remainingLetters.contains(attemptLetter)) {
+                remainingLetters.remove(attemptLetter);
+                marks.set(i, PRESENT);
+            } else {
+                marks.set(i, ABSENT);
             }
         }
 
         return new Feedback(attempt, marks);
     }
-
-
-
 }

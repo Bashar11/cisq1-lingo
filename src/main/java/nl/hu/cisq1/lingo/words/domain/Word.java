@@ -1,5 +1,7 @@
 package nl.hu.cisq1.lingo.words.domain;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,6 +15,10 @@ public class Word {
 
     public Word() {}
     public Word(String word) {
+        if(StringUtils.isBlank(word)) {
+            throw new IllegalArgumentException("woord mag niet leeg zijn");
+        }
+
         this.value = word;
         this.length = word.length();
     }

@@ -1,5 +1,6 @@
 package nl.hu.cisq1.lingo.trainer.domain;
 
+import nl.hu.cisq1.lingo.trainer.domain.enums.Mark;
 import nl.hu.cisq1.lingo.trainer.domain.exception.InvalidFeedbackException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static nl.hu.cisq1.lingo.trainer.domain.Mark.*;
+import static nl.hu.cisq1.lingo.trainer.domain.enums.Mark.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -68,6 +69,14 @@ public class FeedbackTest {
     }
 
 
+    @ParameterizedTest
+    @MethodSource("provideHintExamples")
+    @DisplayName("giving a hint based on previous hint and word")
+    void testHint(String attempt, String prevHint, List<Mark> marks, String hint) {
+        Feedback feedback = new Feedback(attempt, marks);
+        assertEquals(hint, feedback.giveHint(attempt, prevHint));
+    }
+
     static Stream<Arguments> provideHintExamples() {
         return Stream.of(
                 Arguments.of("klaar", "k....", List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT), "klaar"),
@@ -79,33 +88,25 @@ public class FeedbackTest {
         );
     }
 
-    @ParameterizedTest
-    @MethodSource("provideHintExamples")
-    @DisplayName("giving a hint based on previous hint and word")
-    void testHint(String attempt, String prevHint, List<Mark> marks, String hint) {
-        Feedback feedback = new Feedback(attempt, marks);
-        assertEquals(hint, feedback.giveHint(attempt, prevHint));
-    }
-
-
-    static Stream<Arguments> provideFeedbackExamples() {
-        return Stream.of(
-                Arguments.of("klaar", "klaar", List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT)),
-                Arguments.of("woord", "wadde", List.of(CORRECT, ABSENT, PRESENT, ABSENT, ABSENT)),
-                Arguments.of("woord", "worre", List.of(CORRECT, CORRECT, ABSENT, CORRECT, ABSENT)),
-                Arguments.of("woord", "wordo", List.of(CORRECT, CORRECT, PRESENT, PRESENT, PRESENT)),
-                Arguments.of("woord", "waaod", List.of(CORRECT, ABSENT, ABSENT, PRESENT, CORRECT)),
-                Arguments.of("woord", "%$#@!", List.of(INVALID, INVALID, INVALID, INVALID, INVALID)),
-                Arguments.of("paard", "attaa", List.of(PRESENT, ABSENT, ABSENT, PRESENT, ABSENT))
-
-        );
-    }
 
     @ParameterizedTest
     @MethodSource("provideFeedbackExamples")
     @DisplayName("guessing a right word in a round")
     void testFeedback(String wordToGuess, String attempt, List<Mark> marks) {
         assertEquals(Feedback.basedOn(wordToGuess, attempt), new Feedback(attempt, marks));
+    }
+
+    static Stream<Arguments> provideFeedbackExamples() {
+        return Stream.of(
+                Arguments.of("klaar", "klaar", List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT)),
+                Arguments.of("woord", "waaaa", List.of(CORRECT, ABSENT, ABSENT, ABSENT, ABSENT)),
+                Arguments.of("woord", "worre", List.of(CORRECT, CORRECT, ABSENT, CORRECT, ABSENT)),
+                Arguments.of("woord", "wordo", List.of(CORRECT, CORRECT, PRESENT, PRESENT, PRESENT)),
+                Arguments.of("woord", "waaod", List.of(CORRECT, ABSENT, ABSENT, PRESENT, CORRECT)),
+                Arguments.of("paard", "attaa", List.of(PRESENT, ABSENT, ABSENT, PRESENT, ABSENT)),
+                Arguments.of("baard", "barst", List.of(CORRECT, CORRECT, PRESENT, ABSENT, ABSENT)),
+                Arguments.of("baard", "draad", List.of(ABSENT, PRESENT, CORRECT, PRESENT, CORRECT))
+        );
     }
 
 
@@ -115,7 +116,7 @@ public class FeedbackTest {
         String attempt = "klaar";
         List<Mark> marks = List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT);
         Feedback feedback = new Feedback(attempt, marks);
-        assertEquals(feedback.getAttempt().length(),5);
+        assertEquals(5, feedback.getAttempt().length());
 
     }
 
@@ -126,7 +127,7 @@ public class FeedbackTest {
         List<Mark> marks = List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT);
         Feedback feedback = new Feedback(attempt, marks);
         feedback.setId(1L);
-        assertEquals(feedback.getId(),1);
+        assertEquals(1, feedback.getId());
 
     }
 
@@ -136,7 +137,7 @@ public class FeedbackTest {
         String attempt = "klaar";
         List<Mark> marks = List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT);
         Feedback feedback = new Feedback(attempt, marks);
-        Feedback feedback1 = new Feedback(attempt,marks);
+        Feedback feedback1 = new Feedback(attempt, marks);
         assertEquals(feedback.hashCode(), feedback1.hashCode());
 
     }
@@ -149,21 +150,8 @@ public class FeedbackTest {
         Feedback feedback = new Feedback();
         feedback.setAttempt(attempt);
         feedback.setMarks(marks);
-        assertEquals(feedback.getAttempt(),attempt);
-        assertEquals(feedback.getMarks(),marks);
-
-    }
-
-
-    @Test
-    @DisplayName("setting the round in feedback ")
-    void roundInfeedbackCheck() {
-        String attempt = "klaar";
-        List<Mark> marks = List.of(CORRECT, CORRECT, CORRECT, CORRECT, CORRECT);
-        Feedback feedback = new Feedback(attempt, marks);
-        Round round = new Round();
-        feedback.setRound(round);
-        assertEquals(feedback.getRound(),round);
+        assertEquals(feedback.getAttempt(), attempt);
+        assertEquals(feedback.getMarks(), marks);
 
     }
 

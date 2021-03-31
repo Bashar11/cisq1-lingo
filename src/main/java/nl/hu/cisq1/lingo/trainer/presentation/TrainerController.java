@@ -1,12 +1,11 @@
 package nl.hu.cisq1.lingo.trainer.presentation;
 
-
 import nl.hu.cisq1.lingo.trainer.application.TrainerGameService;
 import nl.hu.cisq1.lingo.trainer.domain.LingoGame;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import nl.hu.cisq1.lingo.trainer.domain.exception.GameNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/lingo/game")
@@ -17,41 +16,22 @@ public class TrainerController {
     public TrainerController(TrainerGameService gameService) {
         this.gameService = gameService;
     }
+
     @PostMapping()
-    public GameDto startGame(){
+    public GameDto startGame() {
         LingoGame game = this.gameService.startGame();
-        return createGameId(game);
+        return new GameDto(game);
     }
+
     @PostMapping("/{id}/guess")
-    public GameDto makeGuess(@PathVariable(value = "id") Long id, String wordToGuess){
-        LingoGame game = this.gameService.makeGuess(id,wordToGuess);
-        return guessingWord(game) ;
+    public GameDto makeGuess(@PathVariable(value = "id") Long id, @RequestBody AttemptDto attemptDto) {
+            LingoGame game = this.gameService.makeGuess(id, attemptDto.attempt);
+            return new GameDto(game);
     }
 
-    @PostMapping("{id}/newRound")
-    public GameDto newRound(@PathVariable(value = "id") Long id){
-         LingoGame game = this.gameService.newRound(id);
-
-
-        return creatingRound(game);
+    @PostMapping("{id}/round")
+    public GameDto newRound(@PathVariable(value = "id") Long id) {
+            LingoGame game = this.gameService.newRound(id);
+            return new GameDto(game);
     }
-
-
-
-
-    private GameDto createGameId(LingoGame lingoGame){
-        return new GameDto(
-                lingoGame.getId());
-    }
-
-    private GameDto guessingWord(LingoGame lingoGame){
-        return new GameDto(
-                lingoGame.getId(),
-                lingoGame.getWordToGuess());
-    }
-
-    private GameDto creatingRound(LingoGame lingoGame){
-        return new GameDto(lingoGame.getLastRound().getId());
-    }
-
 }

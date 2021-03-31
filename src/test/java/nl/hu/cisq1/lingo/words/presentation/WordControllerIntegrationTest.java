@@ -42,7 +42,7 @@ class WordControllerIntegrationTest {
                 .param("length", "8");
 
         mockMvc.perform(request)
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
     }
 
     @Test

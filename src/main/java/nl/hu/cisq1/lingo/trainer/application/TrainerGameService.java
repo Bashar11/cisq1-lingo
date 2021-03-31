@@ -4,7 +4,6 @@ import nl.hu.cisq1.lingo.trainer.data.TrainerRepository;
 import nl.hu.cisq1.lingo.trainer.domain.LingoGame;
 import nl.hu.cisq1.lingo.trainer.domain.exception.GameNotFoundException;
 import nl.hu.cisq1.lingo.words.application.WordService;
-import nl.hu.cisq1.lingo.words.domain.Word;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -21,40 +20,32 @@ public class TrainerGameService {
         this.gameRepository = gameRepository;
     }
 
-    public LingoGame startGame(){
+    public LingoGame startGame() {
         LingoGame game = new LingoGame();
         this.gameRepository.save(game);
         return game;
 
     }
 
-    public LingoGame newRound(long gameId) {
-        LingoGame game=getGame(gameId);
-        String wordToGuess = this.wordService.provideRandomWord(5);
+    public LingoGame newRound(Long gameId) {
+        LingoGame game = getGame(gameId);
+        String wordToGuess = wordService.provideRandomWord(game.provideNextWordLength());
         game.startNewRound(wordToGuess);
         gameRepository.save(game);
         return game;
     }
 
-    public LingoGame makeGuess(long id,String wordToGuess){
+    public LingoGame makeGuess(Long id, String attempt) {
 
         LingoGame game = getGame(id);
-        game.guess(wordToGuess);
+        game.guess(attempt);
         gameRepository.save(game);
         return game;
     }
 
-
-
-
-
-
-
-
     public LingoGame getGame(long gameId) {
         return gameRepository.findById(gameId).orElseThrow(GameNotFoundException::new);
     }
-
 
 
 }

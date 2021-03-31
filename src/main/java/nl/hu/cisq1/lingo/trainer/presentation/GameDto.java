@@ -2,36 +2,33 @@ package nl.hu.cisq1.lingo.trainer.presentation;
 
 import lombok.Getter;
 import lombok.Setter;
+import nl.hu.cisq1.lingo.trainer.domain.Feedback;
+import nl.hu.cisq1.lingo.trainer.domain.LingoGame;
 import nl.hu.cisq1.lingo.trainer.domain.Round;
-import nl.hu.cisq1.lingo.trainer.domain.State;
+import nl.hu.cisq1.lingo.trainer.domain.enums.State;
 
-import java.util.ArrayList;
 import java.util.List;
 
+
 @Getter
-@Setter
+
 
 public class GameDto {
 
-    private Long id;
+    private final Long id;
+    private final double score;
+    private final State state;
+    private final int attempts;
+    private final String lastHint;
+    private final List<Feedback> feedbacks;
 
-    private int score;
-
-    private State state;
-    private String wordToGuess;
-
-    private List<Round>rounds = new ArrayList<>();
-
-    private int length;
-
-    public GameDto(Long id) {
-        this.id = id;
-    }
-
-    public GameDto(Long id, String wordToGuess){
-        this.id = id;
-        this.wordToGuess = wordToGuess;
-
-
+    public GameDto(LingoGame game) {
+        this.id = game.getId();
+        this.score = game.getScore();
+        this.state = game.getGameState();
+        Round lastRound = game.getLastRound();
+        this.attempts = lastRound.getAttempts();
+        this.lastHint = lastRound.getLastHint();
+        this.feedbacks = lastRound.getFeedbacks();
     }
 }
