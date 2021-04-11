@@ -10,7 +10,9 @@ import nl.hu.cisq1.lingo.words.application.WordService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
 import static org.hamcrest.Matchers.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,7 +62,7 @@ public class ControllerIntegrationTest {
                 .andExpect(jsonPath("$.id", greaterThanOrEqualTo(0)))
                 .andExpect(jsonPath("$.score", is(0.0)))
                 .andExpect(content().string(containsString("\"state\":\"STARTING\"")));
-        assertNotEquals(gameId, null);
+        assertNotEquals(null, gameId);
     }
 
     @Test
@@ -81,8 +83,6 @@ public class ControllerIntegrationTest {
         mockMvc.perform(request)
                 .andExpect(status().isNotFound());
     }
-
-
 
 
     @Test
@@ -149,8 +149,6 @@ public class ControllerIntegrationTest {
                 .andExpect(status().isNotFound());
 
     }
-
-
 
 
 }

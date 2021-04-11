@@ -97,7 +97,7 @@ class RoundTest {
     @DisplayName("Testing the string of a word that should be guessed")
     void stringCheck() {
         Round round = new Round("slaan");
-        assertEquals(round.getWordToGuess(), "slaan");
+        assertEquals("slaan",round.getWordToGuess());
     }
 
     @Test
@@ -106,7 +106,7 @@ class RoundTest {
         Round round = new Round("slaan");
         round.guess("staar");
         round.guess("slark");
-        assertEquals(round.getAttempts(), 2);
+        assertEquals(2,round.getAttempts());
     }
 
     @Test
@@ -116,7 +116,7 @@ class RoundTest {
         round.guess("staar");
         round.guess("slark");
         round.setId(1L);
-        assertEquals(round.getId(), 1);
+        assertEquals(1,round.getId());
     }
 
 

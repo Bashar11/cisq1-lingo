@@ -2,10 +2,7 @@ package nl.hu.cisq1.lingo.trainer.presentation;
 
 import nl.hu.cisq1.lingo.trainer.application.TrainerGameService;
 import nl.hu.cisq1.lingo.trainer.domain.LingoGame;
-import nl.hu.cisq1.lingo.trainer.domain.exception.GameNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/lingo/game")

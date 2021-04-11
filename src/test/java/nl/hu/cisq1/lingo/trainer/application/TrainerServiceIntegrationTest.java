@@ -9,9 +9,7 @@ import nl.hu.cisq1.lingo.trainer.domain.exception.GameNotFoundException;
 import nl.hu.cisq1.lingo.words.application.WordService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
 import static org.mockito.Mockito.*;
-
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,6 +43,16 @@ public class TrainerServiceIntegrationTest {
         assertEquals(1, game.getRounds().size());
     }
 
+    @Test
+    @DisplayName("starting a new game")
+    void initalizeOfGame() {
+        LingoGame game= new LingoGame();
+        game.startNewRound("pizza");
+        this.repository.save(game);
+        assertNotNull(this.gameService.startGame());
+    }
+
+
 
     @Test
     @DisplayName("starting a game with a round and returning some attributes")
@@ -54,10 +62,10 @@ public class TrainerServiceIntegrationTest {
         gameService = new TrainerGameService(wordService, repository);
         LingoGame game = gameService.startGame();
         gameService.newRound(game.getId());
-        assertEquals(gameService.getGame(game.getId()).getScore(), 0);
-        assertEquals(gameService.getGame(game.getId()).getGameState(), State.PLAYING);
-        assertEquals(gameService.getGame(game.getId()).getLastRound().getLastHint(), "s....");
-        assertEquals(gameService.getGame(game.getId()).getLastRound().getFeedbacks().size(), 0);
+        assertEquals(0,gameService.getGame(game.getId()).getScore());
+        assertEquals(State.PLAYING,gameService.getGame(game.getId()).getGameState());
+        assertEquals("s....",gameService.getGame(game.getId()).getLastRound().getLastHint());
+        assertEquals(0,gameService.getGame(game.getId()).getLastRound().getFeedbacks().size());
 
 
     }

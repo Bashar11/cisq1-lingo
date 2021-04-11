@@ -1,7 +1,6 @@
 package nl.hu.cisq1.lingo.trainer.presentation;
 
 import lombok.Getter;
-import lombok.Setter;
 import nl.hu.cisq1.lingo.trainer.domain.Feedback;
 import nl.hu.cisq1.lingo.trainer.domain.LingoGame;
 import nl.hu.cisq1.lingo.trainer.domain.Round;
