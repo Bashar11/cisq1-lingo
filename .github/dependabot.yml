@@ -1,0 +1,23 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: org.pitest:pitest-maven
+    versions:
+    - 1.6.4
+  - dependency-name: org.springframework.boot:spring-boot-starter-parent
+    versions:
+    - 2.4.4
+  - dependency-name: io.cucumber:cucumber-java
+    versions:
+    - 6.10.2
+  - dependency-name: org.projectlombok:lombok
+    versions:
+    - 1.18.18
+  - dependency-name: org.springframework.boot:spring-boot-maven-plugin
+    versions:
+    - 2.4.4
